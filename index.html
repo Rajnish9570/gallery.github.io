@@ -3,128 +3,194 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dynamic Images with Local Storage and Remove Button</title>
+<title>Khata Book</title>
 <style>
     body {
-        font-family: Arial, sans-serif;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         margin: 0;
-        padding: 20px;
-        text-align: center;
-        background-color: blueviolet;
+        padding: 0;
+        background-color: #f9f9f9;
     }
- 
-    #container{
-        background-color: white;
+    .container {
+        max-width: 80%;
+        margin: 20px auto;
         padding: 20px;
-    }
-
-    input{
         background-color: #fff;
-        border: solid 2px blue;
-        width: 40%;
-        height: 30px;
-        padding: 10px;
-    }
-
-    .remove-button {
-        background-color: #ff0000;
-        color: #fff;
-        border: none;
-        padding: 5px 10px;
-        border-radius: 5px;
-        cursor: pointer;
-        position: absolute;
-        top: 5px;
-        right: 5px;
-    }
-
-    .image-container {
-        display: flex; /* Use flexbox */
-        flex-wrap: wrap; /* Allow wrapping to next line */
-        justify-content: center; /* Center the images horizontally */
-    }
-
-    .image-container img {
-        max-width: 400px;
-        max-height: 400px;
-        margin: 10px;
         border-radius: 10px;
-        border: 5px snow solid;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+    form {
+        margin-bottom: 20px;
+    }
+    input[type="text"], input[type="number"], input[type="date"] {
+        width: 50%;
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 5px;
+        border: 0.5px solid #ff3;
+        box-sizing: border-box;
+        outline:;
+    }
+    input[type="submit"] {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        cursor: pointer;
+        width: 40%;
+        box-sizing: border-box;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+    th {
+        background-color: #f2f2f2;
+        color: #333;
+    }
+    .delete-btn {
+        background-color: #f44336;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        padding: 8px 12px;
+        cursor: pointer;
+    }
+    h1::first-letter{
+        color: #f44336;
     }
 
+    input:focus{
+        background-color: #f44336;
+        outline: none;
+    }
+
+    @media only screen and (max-width: 600px) {
+        form {
+            padding: 10px;
+        }
+        input[type="text"], input[type="number"], input[type="date"], input[type="submit"] {
+            margin-bottom: 5px;
+            width: 90%;
+        }
+
+        body{
+            font-size: 1rem;
+        }
+    }
 </style>
 </head>
 <body>
-    <div id="container">
-        <h1>Gallery</h1>
-        <input type="file" id="file-input">
-    </div>
-    <div class="image-container" id="image-container"></div>
-    <script>
-        // Function to handle file input change
-        document.getElementById('file-input').addEventListener('change', function(event) {
-            const files = event.target.files;
-            if (files) {
-                const imageUrls = JSON.parse(localStorage.getItem('imageUrls')) || [];
-                for (let i = 0; i < files.length; i++) {
-                    const file = files[i];
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const imageSrc = e.target.result;
-                        const img = document.createElement('img');
-                        img.src = imageSrc;
-                        
-                        const removeBtn = document.createElement('button'); // Create remove button for each image
-                        removeBtn.textContent = 'Remove';
-                        removeBtn.className = 'remove-button';
-                        removeBtn.addEventListener('click', function() {
-                            const index = imageUrls.indexOf(imageSrc);
-                            if (index !== -1) {
-                                imageUrls.splice(index, 1);
-                                localStorage.setItem('imageUrls', JSON.stringify(imageUrls));
-                                img.parentNode.remove(); // Remove the parent container which holds both the image and remove button
-                            }
-                        });
-                        
-                        const container = document.createElement('div');
-                        container.appendChild(img);
-                        container.appendChild(removeBtn); // Append remove button to the container
-                        document.getElementById('image-container').appendChild(container);
-                        
-                        imageUrls.push(imageSrc);
-                        localStorage.setItem('imageUrls', JSON.stringify(imageUrls));
-                    };
-                    reader.readAsDataURL(file);
-                }
-            }
-        });
 
-        // Function to load images from local storage on page load
-        window.onload = function() {
-            const imageUrls = JSON.parse(localStorage.getItem('imageUrls')) || [];
-            const imageContainer = document.getElementById('image-container');
-            imageUrls.forEach(function(url) {
-                const img = document.createElement('img');
-                img.src = url;
-                
-                const removeBtn = document.createElement('button');
-                removeBtn.textContent = 'Remove';
-                removeBtn.className = 'remove-button';
-                removeBtn.addEventListener('click', function() {
-                    const index = imageUrls.indexOf(url);
-                    if (index !== -1) {
-                        imageUrls.splice(index, 1);
-                        localStorage.setItem('imageUrls', JSON.stringify(imageUrls));
-                        img.parentNode.remove(); // Remove the parent container which holds both the image and remove button
-                    }
-                });
-                
-                const container = document.createElement('div');
-                container.appendChild(img);
-                container.appendChild(removeBtn);
-                imageContainer.appendChild(container);
-            });
+<div class="container">
+    <h1>Khata Book</h1>
+    <form id="transactionForm">
+        <input type="text" id="name" placeholder="Your Name">
+        <input type="text" id="description" placeholder="Description">
+        <input type="number" id="amount" placeholder="Amount">
+        <input type="date" id="date"> <br>
+        <input type="submit" value="Add Transaction">
+    </form>
+
+    <table id="transactionTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="transactionBody">
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Load transactions from local storage
+    document.addEventListener("DOMContentLoaded", function() {
+        var transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+        var tableBody = document.getElementById("transactionBody");
+
+        transactions.forEach(function(transaction) {
+            addTransactionToTable(transaction);
+        });
+    });
+
+    // Function to add transaction to table
+    function addTransactionToTable(transaction) {
+        var tableBody = document.getElementById("transactionBody");
+        var row = tableBody.insertRow();
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        var cell3 = row.insertCell(2);
+        var cell4 = row.insertCell(3);
+        var cell5 = row.insertCell(4);
+
+        cell1.textContent = transaction.name;
+        cell2.textContent = transaction.description;
+        cell3.textContent = transaction.amount;
+        cell4.textContent = transaction.date;
+        cell5.innerHTML = '<button class="delete-btn" onclick="deleteTransaction(this)">Delete</button>';
+    }
+
+    // Function to add transaction
+    function addTransaction() {
+        var name = document.getElementById("name").value;
+        var description = document.getElementById("description").value;
+        var amount = document.getElementById("amount").value;
+        var date = document.getElementById("date").value;
+
+        var transaction = {
+            name: name,
+            description: description,
+            amount: amount,
+            date: date
         };
-    </script>
+
+        // Add transaction to table
+        addTransactionToTable(transaction);
+
+        // Save transaction to local storage
+        var transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+        transactions.push(transaction);
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+
+        // Clear input fields
+        document.getElementById("name").value = "";
+        document.getElementById("description").value = "";
+        document.getElementById("amount").value = "";
+        document.getElementById("date").value = "";
+    }
+
+    // Function to delete transaction
+    function deleteTransaction(row) {
+        var rowIndex = row.parentNode.parentNode.rowIndex;
+        document.getElementById("transactionTable").deleteRow(rowIndex);
+
+        // Update local storage
+        var transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+        transactions.splice(rowIndex - 1, 1);
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+    }
+
+    // Event listener for form submission
+    document.getElementById("transactionForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent default form submission
+        addTransaction(); // Add transaction
+    });
+</script>
+
 </body>
 </html>
