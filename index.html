@@ -129,12 +129,21 @@
         <tbody id="transactionBody">
         </tbody>
     </table>
-<center>
-    <button class="sum-btn" id="sumButton">Select and Click Me</button>
-  
-</center>
-</div>
 
+    <!-- History of Deleted Transactions -->
+    <div id="deletedTransactionHistory" style="margin-top: 20px;">
+      
+        <center>
+     
+        <button class="sum-btn" id="sumButton">Select to view total Amount</button>
+        </center>
+    </div>
+</div>
+<div class="container">
+<h2>Paid Transaction History</h2>
+<ul id="deletedTransactionList"></ul>
+<center>   <button class="sum-btn" id="clearHistoryButton">Clear History</button> <br></center>
+</div>
 <script>
     // Load transactions from local storage
     document.addEventListener("DOMContentLoaded", function() {
@@ -144,6 +153,9 @@
         transactions.forEach(function(transaction) {
             addTransactionToTable(transaction);
         });
+
+        // Load deleted transactions history
+        loadDeletedTransactionHistory();
     });
 
     // Function to add transaction to table
@@ -196,12 +208,42 @@
     // Function to delete transaction
     function deleteTransaction(row) {
         var rowIndex = row.parentNode.parentNode.rowIndex;
-        document.getElementById("transactionTable").deleteRow(rowIndex);
+        var transactionTable = document.getElementById("transactionTable");
+        transactionTable.deleteRow(rowIndex);
 
         // Update local storage
         var transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-        transactions.splice(rowIndex - 1, 1);
+        var deletedTransaction = transactions.splice(rowIndex - 1, 1)[0]; // Remove and get the deleted transaction
         localStorage.setItem("transactions", JSON.stringify(transactions));
+
+        // Add the deleted transaction to a separate history in local storage with current date and time
+        var deletedTransactionsHistory = JSON.parse(localStorage.getItem("deletedTransactions")) || [];
+        deletedTransaction.deletedAt = new Date().toLocaleString(); // Add deletedAt property with current date and time
+        deletedTransactionsHistory.push(deletedTransaction);
+        localStorage.setItem("deletedTransactions", JSON.stringify(deletedTransactionsHistory));
+
+        // Update deleted transaction history display
+        loadDeletedTransactionHistory();
+    }
+
+    // Function to load deleted transaction history
+    function loadDeletedTransactionHistory() {
+        var deletedTransactionsHistory = JSON.parse(localStorage.getItem("deletedTransactions")) || [];
+        var deletedTransactionList = document.getElementById("deletedTransactionList");
+
+        deletedTransactionList.innerHTML = ""; // Clear the list before adding items
+
+        deletedTransactionsHistory.forEach(function(transaction) {
+            var listItem = document.createElement("li");
+            listItem.textContent = transaction.name + " - " + transaction.amount + " - " + transaction.date + " ◾Paid At: " + transaction.deletedAt;
+            deletedTransactionList.appendChild(listItem);
+        });
+    }
+
+    // Function to clear transaction history
+    function clearTransactionHistory() {
+        localStorage.removeItem("deletedTransactions");
+        loadDeletedTransactionHistory(); // Clear the history display
     }
 
     // Function to calculate sum of selected transaction amounts
@@ -230,7 +272,15 @@
     document.getElementById("sumButton").addEventListener("click", function() {
         updateSum();
     });
+
+    // Event listener for clear history button
+    document.getElementById("clearHistoryButton").addEventListener("click", function() {
+        clearTransactionHistory();
+    });
 </script>
 
 </body>
 </html>
+
+
+
