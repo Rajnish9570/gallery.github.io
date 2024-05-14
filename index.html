@@ -52,13 +52,15 @@
         border-collapse: collapse;
     }
     th, td {
-        padding: 12px;
+        padding: 10px;
         text-align: left;
         border-bottom: 1px solid #ddd;
+      
     }
     th {
-        background-color: #f2f2f2;
-        color: #333;
+        font-weight: 600;
+        color: blue;
+        
     }
     .delete-btn {
         background-color: #f44336;
@@ -102,12 +104,30 @@
             font-size: 1rem;
         }
     }
+
+    #container-history{
+        padding: 10px;
+        color: #f709db;
+        background-color: rgb(214, 238, 234);
+        margin: 7px;
+    }
+
+    #show, #hide{
+        height: 30px;
+        width: 25%;
+      margin: 10px ;
+        color: red;
+        outline: none;
+        border: none;
+        background-color: #1f9;
+        font-weight: 600;
+    }
 </style>
 </head>
 <body>
 <h4>"दुकानदारों और छोटे व्यापारी के लिए उधार खाता बुक"</h4>
 <div class="container" >
-    <h1>Khata Book</h1>
+    <h1>Mini Khata Book</h1>
     <div id="sumValue" style="font-weight: 900;font-size:2rem;text-align: center;color: #1e90ff;padding: 10px;"></div>
     <form id="transactionForm">
         <input type="text" id="name" placeholder="Your Name">
@@ -115,7 +135,8 @@
         <input type="date" id="date"> <br>
         <input type="submit" value="Add Transaction">
     </form>
-
+</div>
+ <marquee behavior="" direction=""><h4 style="color:rgb(250, 165, 165);">Say Bye To Pen & Paper, Use Digital MINI KHATA BOOK To Maintain your Udhar Records.</h4></marquee>
     <table id="transactionTable">
         <thead>
             <tr>
@@ -138,12 +159,16 @@
         <button class="sum-btn" id="sumButton">Select to view total Amount</button>
         </center>
     </div>
-</div>
-<div class="container">
+
+<div id="container-history" style="display: none;">
 <h2>Paid Transaction History</h2>
 <ul id="deletedTransactionList"></ul>
 <center>   <button class="sum-btn" id="clearHistoryButton">Clear History</button> <br></center>
 </div>
+
+
+<input type="button" value="Paid Transaction History" id="show" onclick="show()">
+<input type="button" value="Remove Transaction History " id="hide" onclick="hide()" style="display: none;">
 <script>
     // Load transactions from local storage
     document.addEventListener("DOMContentLoaded", function() {
@@ -277,10 +302,22 @@
     document.getElementById("clearHistoryButton").addEventListener("click", function() {
         clearTransactionHistory();
     });
+
+
+    function show(){
+        document.getElementById("container-history").style.display='block';
+        document.getElementById("show").style.display='none';
+        document.getElementById("hide").style.display='block';
+    }
+
+    function hide(){
+        document.getElementById("container-history").style.display='none';
+        document.getElementById("show").style.display='block';
+        document.getElementById("hide").style.display='none';
+    }
 </script>
 
 </body>
 </html>
-
 
 
