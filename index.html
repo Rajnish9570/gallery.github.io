@@ -62,13 +62,17 @@
         color: blue;
     }
 
-      a{
-    margin: 10px;
-    padding: 15px;
-    text-decoration: none;
-    border: 1px blue solid;
-    border-radius: 30px;
-  }
+p ,a{
+   text-align: center;
+   text-decoration: none;
+   font-weight: 900;
+   color: black;
+}
+a{
+    border: 3px dashed blueviolet;
+    padding: 10px;
+    border-radius: 10px;
+}
     .delete-btn {
         background-color: #f44336;
         color: white;
@@ -120,9 +124,9 @@
     }
 
     #show, #hide{
-        height: 30px;
+        height: 50px;
         width: 90%;
-      margin: 10px ;
+        margin: 10px ;
         color: red;
         outline: none;
         border: none;
@@ -173,11 +177,12 @@
 <center>   <button class="sum-btn" id="clearHistoryButton">Clear History</button> <br></center>
 </div>
 
-
+<center>
 <input type="button" value="Paid Transaction History" id="show" onclick="show()">
 <input type="button" value="Remove Transaction History " id="hide" onclick="hide()" style="display: none;">
-<hr>
-    <a href="bill.html">Invoice Generator</a>
+</center>
+
+ <p><a href="bill.html">Invoice Generator</a></p>
 <script>
     // Load transactions from local storage
     document.addEventListener("DOMContentLoaded", function() {
@@ -328,5 +333,4 @@
 
 </body>
 </html>
-
 
