@@ -148,7 +148,7 @@ th{
     function addItem() {
       const itemName = prompt("Enter item name:");
       const rate = parseFloat(prompt("Enter rate:"));
-      const quantity = parseInt(prompt("Enter quantity:"));
+      const quantity = parseFloat(prompt("Enter quantity:"));
       const unit = prompt("Enter unit:");
 
       if (!itemName || isNaN(rate) || isNaN(quantity) || !unit) {
