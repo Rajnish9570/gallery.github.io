@@ -190,7 +190,7 @@ a{
       const amounts = Array.from(document.querySelectorAll("#itemsBody tr td:nth-child(4)"))
                         .map(td => parseFloat(td.textContent.slice(1))); // Remove $ and parse
       const total = amounts.reduce((acc, curr) => acc + curr, 0);
-      document.getElementById("total").value = "$" + total.toFixed(2);
+      document.getElementById("total").value = "Rs " + total.toFixed(2);
     }
 
     function printInvoice() {
