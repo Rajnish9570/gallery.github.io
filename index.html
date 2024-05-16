@@ -116,14 +116,14 @@ a{
         }
     }
 
-    #container-history{
+    #container-history, #editHistoryContainer{
         padding: 10px;
         color: #f709db;
         background-color: rgb(214, 238, 234);
         margin: 7px;
     }
 
-    #show, #hide{
+    #show, #hide, #hideEditHistory, #showEditHistory{
         height: 50px;
         width: 90%;
         margin: 10px ;
@@ -177,9 +177,17 @@ a{
 <center>   <button class="sum-btn" id="clearHistoryButton">Clear History</button> <br></center>
 </div>
 
+<div id="editHistoryContainer" style="display: none;">
+    <h2>Received Amount History</h2>
+    <ul id="editHistoryList"></ul>
+    <center><button class="sum-btn" id="clearEditHistoryButton">Clear Received history</button><br></center>
+</div>
+
 <center>
 <input type="button" value="Paid Transaction History" id="show" onclick="show()">
 <input type="button" value="Remove Transaction History " id="hide" onclick="hide()" style="display: none;">
+<input type="button" value=" Received Amount History" id="showEditHistory" onclick="showEditHistory()">
+<input type="button" value="Remove Received Amount History" id="hideEditHistory" onclick="hideEditHistory()" style="display: none;">
 </center>
 
  <p><a href="bill.html">Invoice Generator</a></p>
@@ -189,18 +197,23 @@ a{
         var transactions = JSON.parse(localStorage.getItem("transactions")) || [];
         var tableBody = document.getElementById("transactionBody");
 
-        transactions.forEach(function(transaction) {
-            addTransactionToTable(transaction);
+        transactions.forEach(function(transaction, index) {
+            addTransactionToTable(transaction, index);
         });
 
         // Load deleted transactions history
         loadDeletedTransactionHistory();
+
+        // Load edit history
+        loadEditHistory();
     });
 
     // Function to add transaction to table
-    function addTransactionToTable(transaction) {
+    function addTransactionToTable(transaction, index) {
         var tableBody = document.getElementById("transactionBody");
         var row = tableBody.insertRow();
+        row.setAttribute("data-index", index);
+
         var cell1 = row.insertCell(0);
         var cell2 = row.insertCell(1);
         var cell3 = row.insertCell(2);
@@ -213,7 +226,16 @@ a{
         cell1.appendChild(selectBox);
 
         cell2.textContent = transaction.name;
-        cell3.textContent = transaction.amount;
+
+        var amountInput = document.createElement("input");
+        amountInput.type = "number";
+        amountInput.value = transaction.amount;
+        amountInput.className = "amount-input";
+        amountInput.addEventListener("change", function() {
+            updateTransactionAmount(index, amountInput.value);
+        });
+        cell3.appendChild(amountInput);
+
         cell4.textContent = transaction.date;
         cell5.innerHTML = '<button class="delete-btn" onclick="deleteTransaction(this)">Paid</button>';
     }
@@ -231,17 +253,38 @@ a{
         };
 
         // Add transaction to table
-        addTransactionToTable(transaction);
-
-        // Save transaction to local storage
         var transactions = JSON.parse(localStorage.getItem("transactions")) || [];
         transactions.push(transaction);
         localStorage.setItem("transactions", JSON.stringify(transactions));
+        addTransactionToTable(transaction, transactions.length - 1);
 
         // Clear input fields
         document.getElementById("name").value = "";
         document.getElementById("amount").value = "";
         document.getElementById("date").value = "";
+    }
+
+    // Function to update transaction amount
+    function updateTransactionAmount(index, newAmount) {
+        var transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+        var oldAmount = transactions[index].amount;
+        transactions[index].amount = newAmount;
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+
+        // Log the edit history
+        var editHistory = JSON.parse(localStorage.getItem("editHistory")) || [];
+        editHistory.push({
+            index: index,
+            name: transactions[index].name,
+            oldAmount: oldAmount,
+            newAmount: newAmount,
+            date: transactions[index].date,
+            editedAt: new Date().toLocaleString()
+        });
+        localStorage.setItem("editHistory", JSON.stringify(editHistory));
+
+        // Update the edit history display
+        loadEditHistory();
     }
 
     // Function to delete transaction
@@ -279,10 +322,30 @@ a{
         });
     }
 
+    // Function to load edit history
+    function loadEditHistory() {
+        var editHistory = JSON.parse(localStorage.getItem("editHistory")) || [];
+        var editHistoryList = document.getElementById("editHistoryList");
+
+        editHistoryList.innerHTML = ""; // Clear the list before adding items
+
+        editHistory.forEach(function(edit) {
+            var listItem = document.createElement("li");
+            listItem.textContent = edit.name + " - " + edit.oldAmount + " - " +  edit.date + " ◾Rcv Amt: " + (edit.oldAmount - edit.newAmount) + " " + edit.editedAt;
+            editHistoryList.appendChild(listItem);
+        });
+    }
+
     // Function to clear transaction history
     function clearTransactionHistory() {
         localStorage.removeItem("deletedTransactions");
         loadDeletedTransactionHistory(); // Clear the history display
+    }
+
+    // Function to clear edit history
+    function clearEditHistory() {
+        localStorage.removeItem("editHistory");
+        loadEditHistory(); // Clear the edit history display
     }
 
     // Function to calculate sum of selected transaction amounts
@@ -290,7 +353,7 @@ a{
         var sum = 0;
         var selectCheckboxes = document.querySelectorAll(".select-checkbox:checked");
         selectCheckboxes.forEach(function(checkbox) {
-            sum += parseFloat(checkbox.parentNode.parentNode.cells[2].textContent);
+            sum += parseFloat(checkbox.parentNode.parentNode.querySelector(".amount-input").value);
         });
         return sum.toFixed(2);
     }
@@ -317,6 +380,10 @@ a{
         clearTransactionHistory();
     });
 
+    // Event listener for clear edit history button
+    document.getElementById("clearEditHistoryButton").addEventListener("click", function() {
+        clearEditHistory();
+    });
 
     function show(){
         document.getElementById("container-history").style.display='block';
@@ -329,8 +396,19 @@ a{
         document.getElementById("show").style.display='block';
         document.getElementById("hide").style.display='none';
     }
+
+    function showEditHistory() {
+        document.getElementById("editHistoryContainer").style.display = 'block';
+        document.getElementById("showEditHistory").style.display = 'none';
+        document.getElementById("hideEditHistory").style.display = 'block';
+    }
+
+    function hideEditHistory() {
+        document.getElementById("editHistoryContainer").style.display = 'none';
+        document.getElementById("showEditHistory").style.display = 'block';
+        document.getElementById("hideEditHistory").style.display = 'none';
+    }
 </script>
 
 </body>
 </html>
-
