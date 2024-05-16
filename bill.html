@@ -176,9 +176,9 @@ a{
       const newRow = document.createElement("tr");
       newRow.innerHTML = `
         <td>${itemName}</td>
-        <td>Rs${rate}</td>
+        <td>$Rs{rate}</td>
         <td>${quantity} ${unit}</td>
-        <td>Rs${amount.toFixed(2)}</td>
+        <td>$Rs{amount.toFixed(2)}</td>
       `;
       tbody.appendChild(newRow);
 
