@@ -133,6 +133,13 @@ a{
         background-color: #1f9;
         font-weight: 600;
     }
+    /* Add borders to each history item */
+    #deletedTransactionList li, #editHistoryList li {
+        border: 1px solid #333;
+        padding: 10px;
+        margin-bottom: 10px;
+        list-style: none;
+    }
 </style>
 </head>
 <body>
@@ -192,7 +199,6 @@ a{
 
  <p><a href="bill.html">Invoice Generator</a></p>
 <script>
-    // Load transactions from local storage
     document.addEventListener("DOMContentLoaded", function() {
         var transactions = JSON.parse(localStorage.getItem("transactions")) || [];
         var tableBody = document.getElementById("transactionBody");
@@ -208,7 +214,6 @@ a{
         loadEditHistory();
     });
 
-    // Function to add transaction to table
     function addTransactionToTable(transaction, index) {
         var tableBody = document.getElementById("transactionBody");
         var row = tableBody.insertRow();
@@ -240,7 +245,6 @@ a{
         cell5.innerHTML = '<button class="delete-btn" onclick="deleteTransaction(this)">Paid</button>';
     }
 
-    // Function to add transaction
     function addTransaction() {
         var name = document.getElementById("name").value;
         var amount = document.getElementById("amount").value;
@@ -252,26 +256,22 @@ a{
             date: date
         };
 
-        // Add transaction to table
         var transactions = JSON.parse(localStorage.getItem("transactions")) || [];
         transactions.push(transaction);
         localStorage.setItem("transactions", JSON.stringify(transactions));
         addTransactionToTable(transaction, transactions.length - 1);
 
-        // Clear input fields
         document.getElementById("name").value = "";
         document.getElementById("amount").value = "";
         document.getElementById("date").value = "";
     }
 
-    // Function to update transaction amount
     function updateTransactionAmount(index, newAmount) {
         var transactions = JSON.parse(localStorage.getItem("transactions")) || [];
         var oldAmount = transactions[index].amount;
         transactions[index].amount = newAmount;
         localStorage.setItem("transactions", JSON.stringify(transactions));
 
-        // Log the edit history
         var editHistory = JSON.parse(localStorage.getItem("editHistory")) || [];
         editHistory.push({
             index: index,
@@ -283,72 +283,94 @@ a{
         });
         localStorage.setItem("editHistory", JSON.stringify(editHistory));
 
-        // Update the edit history display
         loadEditHistory();
     }
 
-    // Function to delete transaction
     function deleteTransaction(row) {
         var rowIndex = row.parentNode.parentNode.rowIndex;
         var transactionTable = document.getElementById("transactionTable");
         transactionTable.deleteRow(rowIndex);
 
-        // Update local storage
         var transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-        var deletedTransaction = transactions.splice(rowIndex - 1, 1)[0]; // Remove and get the deleted transaction
+        var deletedTransaction = transactions.splice(rowIndex - 1, 1)[0];
         localStorage.setItem("transactions", JSON.stringify(transactions));
 
-        // Add the deleted transaction to a separate history in local storage with current date and time
         var deletedTransactionsHistory = JSON.parse(localStorage.getItem("deletedTransactions")) || [];
-        deletedTransaction.deletedAt = new Date().toLocaleString(); // Add deletedAt property with current date and time
+        deletedTransaction.deletedAt = new Date().toLocaleString();
         deletedTransactionsHistory.push(deletedTransaction);
         localStorage.setItem("deletedTransactions", JSON.stringify(deletedTransactionsHistory));
 
-        // Update deleted transaction history display
         loadDeletedTransactionHistory();
     }
 
-    // Function to load deleted transaction history
     function loadDeletedTransactionHistory() {
         var deletedTransactionsHistory = JSON.parse(localStorage.getItem("deletedTransactions")) || [];
         var deletedTransactionList = document.getElementById("deletedTransactionList");
 
-        deletedTransactionList.innerHTML = ""; // Clear the list before adding items
+        deletedTransactionList.innerHTML = "";
 
-        deletedTransactionsHistory.forEach(function(transaction) {
+        deletedTransactionsHistory.forEach(function(transaction, index) {
             var listItem = document.createElement("li");
             listItem.textContent = transaction.name + " - " + transaction.amount + " - " + transaction.date + " ◾Paid At: " + transaction.deletedAt;
+
+            var deleteBtn = document.createElement("button");
+            deleteBtn.className = "delete-btn";
+            deleteBtn.textContent = "Delete";
+            deleteBtn.onclick = function() {
+                deleteIndividualDeletedTransaction(index);
+            };
+            listItem.appendChild(deleteBtn);
+
             deletedTransactionList.appendChild(listItem);
         });
     }
 
-    // Function to load edit history
+    function deleteIndividualDeletedTransaction(index) {
+        var deletedTransactionsHistory = JSON.parse(localStorage.getItem("deletedTransactions")) || [];
+        deletedTransactionsHistory.splice(index, 1);
+        localStorage.setItem("deletedTransactions", JSON.stringify(deletedTransactionsHistory));
+        loadDeletedTransactionHistory();
+    }
+
     function loadEditHistory() {
         var editHistory = JSON.parse(localStorage.getItem("editHistory")) || [];
         var editHistoryList = document.getElementById("editHistoryList");
 
-        editHistoryList.innerHTML = ""; // Clear the list before adding items
+        editHistoryList.innerHTML = "";
 
-        editHistory.forEach(function(edit) {
+        editHistory.forEach(function(edit, index) {
             var listItem = document.createElement("li");
             listItem.textContent = edit.name + " - " + edit.oldAmount + " - " +  edit.date + " ◾Rcv Amt: " + (edit.oldAmount - edit.newAmount) + " " + edit.editedAt;
+
+            var deleteBtn = document.createElement("button");
+            deleteBtn.className = "delete-btn";
+            deleteBtn.textContent = "Delete";
+            deleteBtn.onclick = function() {
+                deleteIndividualEditHistory(index);
+            };
+            listItem.appendChild(deleteBtn);
+
             editHistoryList.appendChild(listItem);
         });
     }
 
-    // Function to clear transaction history
+    function deleteIndividualEditHistory(index) {
+        var editHistory = JSON.parse(localStorage.getItem("editHistory")) || [];
+        editHistory.splice(index, 1);
+        localStorage.setItem("editHistory", JSON.stringify(editHistory));
+        loadEditHistory();
+    }
+
     function clearTransactionHistory() {
         localStorage.removeItem("deletedTransactions");
-        loadDeletedTransactionHistory(); // Clear the history display
+        loadDeletedTransactionHistory();
     }
 
-    // Function to clear edit history
     function clearEditHistory() {
         localStorage.removeItem("editHistory");
-        loadEditHistory(); // Clear the edit history display
+        loadEditHistory();
     }
 
-    // Function to calculate sum of selected transaction amounts
     function calculateSumSelected() {
         var sum = 0;
         var selectCheckboxes = document.querySelectorAll(".select-checkbox:checked");
@@ -358,29 +380,24 @@ a{
         return sum.toFixed(2);
     }
 
-    // Function to update sum value
     function updateSum() {
         var sumValue = document.getElementById("sumValue");
         sumValue.textContent = "Total Amount: " + calculateSumSelected();
     }
 
-    // Event listener for form submission
     document.getElementById("transactionForm").addEventListener("submit", function(event) {
-        event.preventDefault(); // Prevent default form submission
-        addTransaction(); // Add transaction
+        event.preventDefault();
+        addTransaction();
     });
 
-    // Event listener for sum button
     document.getElementById("sumButton").addEventListener("click", function() {
         updateSum();
     });
 
-    // Event listener for clear history button
     document.getElementById("clearHistoryButton").addEventListener("click", function() {
         clearTransactionHistory();
     });
 
-    // Event listener for clear edit history button
     document.getElementById("clearEditHistoryButton").addEventListener("click", function() {
         clearEditHistory();
     });
