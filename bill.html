@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,71 +5,57 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Invoice</title>
   <style>
-  
- body {
-      
+    body {
       font-family: Arial, sans-serif;
     }
-
     .container {
       max-width: 800px;
       margin: 0 auto;
       padding: 20px;
       border: 1px solid #ccc;
     }
-
     h1 {
       text-align: center;
     }
-
     .info {
       margin-bottom: 20px;
     }
-
     .info div {
       margin-bottom: 10px;
     }
-
     .info label {
       font-weight: bold;
     }
-
     table {
       width: 100%;
-     border-collapse: collapse;
+      border-collapse: collapse;
       margin-bottom: 20px;
       margin: 5px;
-    
     }
-
     th, td {
-    
       padding: 10px;
       text-align: left;
-  
     }
-th{
-  color: blueviolet;
-  border-bottom: 0.5px solid blueviolet;
-  background-color: #ccc;
-}
+    th {
+      color: blueviolet;
+      border-bottom: 0.5px solid blueviolet;
+      background-color: #ccc;
+    }
     .total {
       text-align: right;
       margin-bottom: 20px;
     }
-
-    p ,a{
-   text-align: center;
-   text-decoration: none;
-   font-weight: 900;
-   color: black;
-}
-a{
-    border: 3px dashed blueviolet;
-    padding: 10px;
-    border-radius: 10px;
-}
-
+    p, a {
+      text-align: center;
+      text-decoration: none;
+      font-weight: 900;
+      color: black;
+    }
+    a {
+      border: 3px dashed blueviolet;
+      padding: 10px;
+      border-radius: 10px;
+    }
     button {
       padding: 10px 20px;
       background-color: #007bff;
@@ -80,23 +65,22 @@ a{
       cursor: pointer;
       margin-right: 10px;
     }
-
     button:hover {
       background-color: #0056b3;
     }
-    input{
-        width: 90%;
-        border: none;
+    input {
+      width: 90%;
+      border: none;
       font-weight: 900;
-        padding: 10px;
-    outline: none;
-    text-transform: uppercase;
+      padding: 10px;
+      outline: none;
+      text-transform: uppercase;
     }
-    #companyName{
-        font-weight: 900;
-        font-size: 1.4rem;
-        text-align: center;
-        border: none;
+    #companyName {
+      font-weight: 900;
+      font-size: 1.4rem;
+      text-align: center;
+      border: none;
     }
   </style>
 </head>
@@ -123,24 +107,24 @@ a{
         <input type="text" id="time" placeholder="Time">
       </div>
     </div>
-    <button onclick="saveInfo()">Save Info</button> 
-    </div>
+    <button onclick="saveInfo()">Save Info</button>
+  </div>
 
-    <table id="itemsTable">
-      <thead>
-        <tr>
-          <th>Item Name</th>
-          <th>Rate</th>
-          <th>Quantity</th>
-          <th>Amount</th>
-        </tr>
-      </thead>
-      <tbody id="itemsBody">
-        <!-- Items will be loaded from local storage here -->
-      </tbody>
-    </table>
+  <table id="itemsTable">
+    <thead>
+      <tr>
+        <th>Item Name</th>
+        <th>Rate</th>
+        <th>Quantity</th>
+        <th>Amount</th>
+      </tr>
+    </thead>
+    <tbody id="itemsBody">
+      <!-- Items will be loaded from local storage here -->
+    </tbody>
+  </table>
     
-    <div class="container">
+  <div class="container">
     <div class="total">
       <span style="font-size: 1.5rem;font-weight: 900;">Total:</span> <br>
       <input type="text" id="total" readonly style="color: blueviolet;font-weight: 900;font-size: 2rem;">
@@ -148,16 +132,30 @@ a{
     <button onclick="addItem()">Add Item</button>
     <button onclick="clearAll()">Clear All</button>
     <button onclick="printInvoice()">Print Invoice</button>
-    </div>
+  </div>
   <br>
-<p><a href="index.html">Khata book</a></p>
+  <p><a href="index.html">Khata book</a></p>
 
   <script>
-    // Load items and info from local storage on page load
     document.addEventListener("DOMContentLoaded", function() {
       loadItemsFromStorage();
       loadInfoFromStorage();
+      setCurrentDateTime();
     });
+
+    function setCurrentDateTime() {
+      const now = new Date();
+      const date = now.toISOString().split('T')[0];
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      const formattedHours = hours % 12 || 12; // Convert 24-hour to 12-hour format
+      const ampm = hours >= 12 ? "PM" : "AM";
+      const time = `${formattedHours}:${minutes < 10 ? '0' + minutes : minutes} ${ampm}`;
+
+      document.getElementById("date").value = date;
+      document.getElementById("time").value = time;
+      saveInfo(); // Save the date and time immediately to local storage
+    }
 
     function addItem() {
       const itemName = prompt("Enter item name:");
@@ -231,7 +229,7 @@ a{
       const date = document.getElementById("date").value;
       const time = document.getElementById("time").value;
     
-      const info = { companyName, shopName, phoneNo, address, date, time, };
+      const info = { companyName, shopName, phoneNo, address, date, time };
       localStorage.setItem("invoiceInfo", JSON.stringify(info));
     }
 
@@ -244,15 +242,7 @@ a{
         document.getElementById("phoneNo").value = phoneNo;
         document.getElementById("address").value = address;
         document.getElementById("date").value = date;
-        document.getElementById("date").value = date;
-
-
-        // Split the time into hours and minutes
-        const [hours, minutes] = time.split(":");
-        const formattedHours = hours % 12 || 12; // Convert 24-hour to 12-hour format
-        const ampm = hours >= 12 ? "PM" : "AM";
-
-        document.getElementById("time").value = `${formattedHours}:${minutes} ${ampm}`;
+        document.getElementById("time").value = time;
       }
     }
 
